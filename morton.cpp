@@ -90,35 +90,37 @@ void morton(const int N, const value_type* const x, const value_type* const y, u
 
     // Loop over particles to compute their morton index
     {
-    for(int i=0; i<N; i++) {
-        // Prepare some variables we will use to distinguish between upper, lower, left and right square.
-        value_type extTemp = ext;
-        value_type xminTemp = xmin;
-        value_type yminTemp = ymin;
+#pragma omp parallel for
+        for (int i = 0; i < N; i++) {
+            // Prepare some variables we will use to distinguish between upper, lower, left and right square.
+            value_type extTemp = ext;
+            value_type xminTemp = xmin;
+            value_type yminTemp = ymin;
 
 
-        // Here indexValue contains the value that is added or not added to the index to distinguish between the upper
-        // and lower areas, i.e. the decimal representation of the morton bits.
-        uint32_t indexValue = pow(2, ((depth - 1) * 2));
-        index[i] = 0;
+            // Here indexValue contains the value that is added or not added to the index to distinguish between the upper
+            // and lower areas, i.e. the decimal representation of the morton bits.
+            uint32_t indexValue = pow(2, ((depth - 1) * 2));
+            index[i] = 0;
 
-        // Loop over the number of subdivisions
-        for (int j = 1; j <= depth; j++) {
-            // Compute the value to be added to the morton index based on this level
-            int q = quadrant(xminTemp, yminTemp, extTemp, x[i], y[i]);
-            index[i] += q * indexValue;
+            // Loop over the number of subdivisions
+            for (int j = 1; j <= depth; j++) {
+                // Compute the value to be added to the morton index based on this level
+                int q = quadrant(xminTemp, yminTemp, extTemp, x[i], y[i]);
+                index[i] += q * indexValue;
 
-            // Compute the new xmin, ymin and ext
-            extTemp = ext / 2;
-            xminTemp += (q % 2) * extTemp;
-            yminTemp += (q < 2) ? extTemp : 0;
+                // Compute the new xmin, ymin and ext
+                extTemp = ext / 2;
+                xminTemp += (q % 2) * extTemp;
+                yminTemp += (q < 2) ? extTemp : 0;
 
-            // Compute the value for indexValue for the next iteration.
-            indexValue = indexValue / 4;
+                // Compute the value for indexValue for the next iteration.
+                indexValue = indexValue / 4;
+            }
         }
     }
-    }
 }
+
 
 // Sort the array index and store the sorting permutation in the array keys
 void sortit(const int N, uint32_t* index, int* keys){

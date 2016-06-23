@@ -3,8 +3,6 @@
 //
 #include <iostream>
 #include "test.h"
-#include "morton.h"
-#include "expansion.h"
 
 using namespace std;
 
@@ -44,7 +42,7 @@ typedef double value_type;
 } */
 
 int main() {
-    time(20);
+    timeBuild(100);
 
     return 0;
 }
