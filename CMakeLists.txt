@@ -3,7 +3,8 @@ project(Serial)
 
 set(CXX g++-5)                                                  # Use g++ version 5 for openMP
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp -ftree-vectorize -fopt-info-vec -O3")   # Use c++11 and openMP
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp -ftree-vectorize -fopt-info-vec -O3 -mavx")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp -ftree-vectorize -fopt-info-vec -O -mavx -mfma") # Use AVX intrinsics and FMA
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp -O -mavx -mfma")
 
 set(SOURCE_FILES
         quadtree.cpp
