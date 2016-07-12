@@ -3,11 +3,12 @@
 //
 
 #include <iostream>
+#include <complex>
+#include "complexAVX.h"
 #include "morton.h"
 #include "quadtree.h"
 #include "timer.hpp"
 #include "expansion.h"
-#include "complex.h"
 
 using namespace std;
 
@@ -160,7 +161,7 @@ bool testAssignParticles(){
     Node children[4];
 
     // Compute the indexvalue of this level so we can easily compute the morton-id's of the children
-    int indexValue_level = pow(2,2*(depth - (root.level + 1)));
+    int indexValue_level = pow(2.0, 2 * (depth - (root.level + 1)));
 
     // Initialize the children nodes
     Node child_0 = Node {root.level + 1, // level
@@ -361,7 +362,7 @@ bool testBuild(){
     value_type mass_sorted[7];
 
     // Allocate the tree array containing all the nodes
-    int maxNodes = (int) min((float)8 * N / k, (float)pow(4, depth));
+    int maxNodes = (int) min((float) 8 * N / k, (float) pow(4.0, depth));
     Node* tree = new Node[maxNodes];
 
 
@@ -414,7 +415,7 @@ value_type timeBuild(int N){
     value_type *mass_sorted = new value_type[N];
 
     // Allocate the tree array containing all the nodes
-    int maxNodes = (int) min((float)8 * N / k, (float)pow(4, depth));
+    int maxNodes = (int) min((float) 8 * N / k, (float) pow(4.0, depth));
     Node* tree = new Node[maxNodes];
 
     cout << "Building the tree for N = " << N << endl;
@@ -760,6 +761,68 @@ bool testMultiply() {
 }
 
 /*
+ * A function to time the multiply() function.
+ */
+value_type timeMultiply(int N) {
+    timer t;
+
+    // INITIALIZATION
+    void *voidPtr;
+
+    // Allocate aligned data
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *x1 = static_cast<double *>(voidPtr);
+
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *x2 = static_cast<double *>(voidPtr);
+
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *y1 = static_cast<double *>(voidPtr);
+
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *y2 = static_cast<double *>(voidPtr);
+
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *res_r = static_cast<double *>(voidPtr);
+
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *res_i = static_cast<double *>(voidPtr);
+
+    // Fill the arrays with data
+    initialize(N, x1, x2, y1);
+    initialize(N, y2, res_r, res_i);
+
+
+    // COMPUTATION
+    t.start();
+    multiply(N, x1, y1, x2, y2, res_r, res_i);
+    t.stop();
+
+    return t.get_timing();
+}
+
+/*
+ * A function to time the regular multiplication function for complex numbers.
+ */
+value_type timeMultiplySTD(int N) {
+    timer t;
+
+    // Create the arrays
+    complex<value_type> *x = new complex<value_type>[N];
+    complex<value_type> *y = new complex<value_type>[N];
+    complex<value_type> *res = new complex<value_type>[N];
+
+    // Perform the N multiplications
+    t.start();
+    for (int i = 0; i < N; ++i) {
+        res[i] = x[i] * y[i];
+    }
+    t.stop();
+
+    return t.get_timing();
+}
+
+/*
  * A function to time something N times and compute the average and variance
  */
 void time(int N){
@@ -767,7 +830,7 @@ void time(int N){
 
     // Track the time N times
     for (int i = 0; i < N; ++i) {
-        times[i] = timep2e(1000000, 5);
+        times[i] = timeMultiply(1000000);
     }
 
     // Compute the average

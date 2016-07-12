@@ -3,7 +3,6 @@
 //
 #include <iostream>
 #include "test.h"
-#include "morton.h"
 
 using namespace std;
 
@@ -43,7 +42,7 @@ typedef double value_type;
 } */
 
 int main() {
-    cout << testMultiply() << endl;
+    time(100);
 
     return 0;
 }

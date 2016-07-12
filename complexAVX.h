@@ -2,8 +2,8 @@
 // Created by Isabelle Tan on 11-07-16.
 //
 
-#ifndef SERIAL_COMPLEX_H
-#define SERIAL_COMPLEX_H
+#ifndef SERIAL_COMPLEXAVX_H
+#define SERIAL_COMPLEXAVX_H
 
 // Set the value_type
 typedef double value_type;
@@ -15,4 +15,4 @@ void multiply(int N, value_type *x1, value_type *y1, value_type *x2, value_type 
               value_type *res_i);
 
 
-#endif //SERIAL_COMPLEX_H
+#endif //SERIAL_COMPLEXAVX_H

@@ -13,7 +13,7 @@ set(SOURCE_FILES
         test.cpp
         timeMorton.cpp
         expansion.cpp
-        complex.cpp)
+        complexAVX.cpp)
 
 set(HEADER_FILES
         morton.h
@@ -22,6 +22,6 @@ set(HEADER_FILES
         timeMorton.h
         timer.hpp
         expansion.h
-        complex.h)
+        complexAVX.h)
 
 add_executable(Serial ${SOURCE_FILES} ${HEADER_FILES})

@@ -52,6 +52,12 @@ bool testp2p();
 // A function to test the complex multiplication function.
 bool testMultiply();
 
+// A function to time the multiply() function.
+value_type timeMultiply(int N);
+
+// A function to time the regular multiplication function for complex numbers.
+value_type timeMultiplySTD(int N);
+
 // A function to time N times that computes the mean and variance
 void time(int N);
 

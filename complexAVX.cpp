@@ -3,7 +3,7 @@
 //
 
 #include <immintrin.h>
-#include "complex.h"
+#include "complexAVX.h"
 #include <iostream>
 
 using namespace std;
@@ -24,14 +24,12 @@ void multiply(int N, value_type *x1, value_type *y1, value_type *x2, value_type 
 
 
         // Compute the real part
-        __m256d res_xx = _mm256_mul_pd(x1_avx, x2_avx);
-        __m256d res_yy = _mm256_mul_pd(y1_avx, y2_avx); // TODO fused multiply-substract possible?
-        __m256d real = _mm256_sub_pd(res_xx, res_yy);
+        __m256d res_yy = _mm256_mul_pd(y1_avx, y2_avx);
+        __m256d real = _mm256_fmsub_pd(x1_avx, x2_avx, res_yy);
 
         // Compute the imaginary part
         __m256d res_x1y2 = _mm256_mul_pd(x1_avx, y2_avx);
-        __m256d res_x2y1 = _mm256_mul_pd(x2_avx, y1_avx);
-        __m256d imag = _mm256_add_pd(res_x1y2, res_x2y1);
+        __m256d imag = _mm256_fmadd_pd(x2_avx, y1_avx, res_x1y2);
 
         // Store the result into res_r and res_i
         _mm256_store_pd(res_r + 4 * i, real);
