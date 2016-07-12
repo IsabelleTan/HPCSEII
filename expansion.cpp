@@ -15,6 +15,7 @@ void p2e(const value_type* const x, const value_type* const y, const value_type*
     // Make arrays to store the radius of each particle and the values for different orders of r that are used in the multiplication
     complex<value_type>* z = new complex<value_type>[nsources];
     complex<value_type>* r = new complex<value_type>[nsources];
+
     for (int i = 0; i < nsources; ++i) {
         r[i] = -q[i];
         z[i] = complex<value_type>(x[i],y[i]) - complex<value_type>(xcom, ycom);

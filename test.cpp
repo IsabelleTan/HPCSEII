@@ -7,6 +7,7 @@
 #include "quadtree.h"
 #include "timer.hpp"
 #include "expansion.h"
+#include "complex.h"
 
 using namespace std;
 
@@ -673,15 +674,11 @@ value_type timep2p(int N){
  */
 bool testp2p(){
     bool result = true;
-    int order = 2;
     int N = 4;
 
     value_type x[4] = {1, 2, 3, 4};
     value_type y[4] = {4, 3, 2, 1};
     value_type mass[4] = {5, 6, 7, 8};
-
-    value_type xCom= 2.5;
-    value_type yCom = 2.5;
 
     value_type x_target = 3;
     value_type y_target = 1;
@@ -708,6 +705,61 @@ bool testp2p(){
 }
 
 /*
+ * A function to test the complex multiplication function.
+ */
+bool testMultiply() {
+    bool result = true;
+
+    int N = 4;
+    void *voidPtr;
+
+    // Allocate aligned data
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *x1 = static_cast<double *>(voidPtr);
+
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *x2 = static_cast<double *>(voidPtr);
+
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *y1 = static_cast<double *>(voidPtr);
+
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *y2 = static_cast<double *>(voidPtr);
+
+    // Initialize the data
+    for (int i = 0; i < N; ++i) {
+        x1[i] = i;
+        x2[i] = i + 8;
+        y1[i] = 1;
+        y2[i] = 2;
+    }
+
+    // Allocate space for the resulting values
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *res_r = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(double));
+    double *res_i = static_cast<double *>(voidPtr);
+
+    // Multiply the complex numbers
+    multiply(N, x1, y1, x2, y2, res_r, res_i);
+
+    double control_r[4] = {-2, 7, 18, 31};
+    double control_i[4] = {8, 11, 14, 17};
+
+    for (int j = 0; j < N; ++j) {
+        if (!(res_r[j] == control_r[j] && res_i[j] == control_i[j])) {
+            result = false;
+        }
+    }
+
+    if (result) {
+        cout << "Test succeeded!" << endl;
+    }
+
+    return result;
+}
+
+/*
  * A function to time something N times and compute the average and variance
  */
 void time(int N){
@@ -715,7 +767,7 @@ void time(int N){
 
     // Track the time N times
     for (int i = 0; i < N; ++i) {
-        times[i] = timee2p(100000,20);
+        times[i] = timep2e(1000000, 5);
     }
 
     // Compute the average

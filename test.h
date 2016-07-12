@@ -49,6 +49,9 @@ value_type timep2p(int N);
 // A function to test the p2p kernel
 bool testp2p();
 
+// A function to test the complex multiplication function.
+bool testMultiply();
+
 // A function to time N times that computes the mean and variance
 void time(int N);
 
