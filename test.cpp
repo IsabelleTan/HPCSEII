@@ -710,7 +710,7 @@ bool testp2p(){
 bool testMultiply() {
     bool result = true;
 
-    int N = 4;
+    int N = 5;
     void *voidPtr;
 
     // Allocate aligned data
@@ -743,8 +743,8 @@ bool testMultiply() {
     // Multiply the complex numbers
     multiply(N, x1, y1, x2, y2, res_r, res_i);
 
-    double control_r[4] = {-2, 7, 18, 31};
-    double control_i[4] = {8, 11, 14, 17};
+    double control_r[5] = {-2, 7, 18, 31, 46};
+    double control_i[5] = {8, 11, 14, 17, 20};
 
     for (int j = 0; j < N; ++j) {
         if (!(res_r[j] == control_r[j] && res_i[j] == control_i[j])) {

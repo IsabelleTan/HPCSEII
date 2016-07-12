@@ -13,7 +13,7 @@ void multiply(int N, value_type *x1, value_type *y1, value_type *x2, value_type 
     // Compute the whole division and the remainder (assuming AVX2 instruction set which supports 256 bit operations)
     int n_vec = 32 / sizeof(value_type);
     int div = N / n_vec;
-    int rem = N - div;
+    int rem = N - div * n_vec;
 
     for (int i = 0; i < div; ++i) {
         // Load the data into the registers
@@ -37,6 +37,10 @@ void multiply(int N, value_type *x1, value_type *y1, value_type *x2, value_type 
         _mm256_store_pd(res_r + 4 * i, real);
         _mm256_store_pd(res_i + 4 * i, imag);
 
-        // TODO treat the remaining array entries
+        // Compute the remaining multiplications
+        for (int i = div * n_vec; i < N; i++) {
+            res_r[i] = x1[i] * x2[i] - y1[i] * y2[i];
+            res_i[i] = x1[i] * y2[i] + x2[i] * y1[i];
+        }
     }
 }
