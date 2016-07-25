@@ -4,11 +4,11 @@
 
 #include <iostream>
 #include <complex>
-#include "complexAVX.h"
 #include "morton.h"
 #include "quadtree.h"
 #include "timer.hpp"
 #include "expansion.h"
+#include "complexAVX.h"
 
 using namespace std;
 
@@ -715,17 +715,17 @@ bool testMultiply() {
     void *voidPtr;
 
     // Allocate aligned data
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *x1 = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *x1 = static_cast<value_type *>(voidPtr);
 
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *x2 = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *x2 = static_cast<value_type *>(voidPtr);
 
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *y1 = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *y1 = static_cast<value_type *>(voidPtr);
 
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *y2 = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *y2 = static_cast<value_type *>(voidPtr);
 
     // Initialize the data
     for (int i = 0; i < N; ++i) {
@@ -736,18 +736,42 @@ bool testMultiply() {
     }
 
     // Allocate space for the resulting values
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *res_r = static_cast<double *>(voidPtr);
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *res_i = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *res_r = static_cast<value_type *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *res_i = static_cast<value_type *>(voidPtr);
 
-    // Multiply the complex numbers
-    multiply(N, x1, y1, x2, y2, res_r, res_i);
+    int SIMD_width = sizeof(__m256d) / sizeof(value_type);
+    int SIMD_blocks = N / SIMD_width;
 
-    double control_r[5] = {-2, 7, 18, 31, 46};
-    double control_i[5] = {8, 11, 14, 17, 20};
+    for (int k = 0; k < SIMD_blocks; ++k) {
+        // Put the numbers in a register
+        __m256d x1_avx = _mm256_load_pd(x1 + k * SIMD_width);
+        __m256d y1_avx = _mm256_load_pd(y1 + k * SIMD_width);
+        __m256d x2_avx = _mm256_load_pd(x2 + k * SIMD_width);
+        __m256d y2_avx = _mm256_load_pd(y2 + k * SIMD_width);
+        __m256d res_r_avx;
+        __m256d res_i_avx;
+
+        // Multiply
+        multiply(x1_avx, y1_avx, x2_avx, y2_avx, &res_r_avx, &res_i_avx);
+
+        // Store the result in the res_r and res_i vectors
+        _mm256_store_pd(res_r + k * SIMD_width, res_r_avx);
+        _mm256_store_pd(res_i + k * SIMD_width, res_i_avx);
+    }
+
+    // Compute left-over indices
+    for (int l = SIMD_width * SIMD_blocks; l < N; ++l) {
+        res_r[l] = x1[l] * x2[l] - y1[l] * y2[l];
+        res_i[l] = x1[l] * y2[l] + x2[l] * y1[l];
+    }
+
+    double control_r[N] = {-2, 7, 18, 31, 46};
+    double control_i[N] = {8, 11, 14, 17, 20};
 
     for (int j = 0; j < N; ++j) {
+        cout << res_r[j] << " " << res_i[j] << endl;
         if (!(res_r[j] == control_r[j] && res_i[j] == control_i[j])) {
             result = false;
         }
@@ -770,32 +794,56 @@ value_type timeMultiply(int N) {
     void *voidPtr;
 
     // Allocate aligned data
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *x1 = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *x1 = static_cast<value_type *>(voidPtr);
 
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *x2 = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *x2 = static_cast<value_type *>(voidPtr);
 
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *y1 = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *y1 = static_cast<value_type *>(voidPtr);
 
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *y2 = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *y2 = static_cast<value_type *>(voidPtr);
 
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *res_r = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *res_r = static_cast<value_type *>(voidPtr);
 
-    posix_memalign(&voidPtr, 64, N * sizeof(double));
-    double *res_i = static_cast<double *>(voidPtr);
+    posix_memalign(&voidPtr, 64, N * sizeof(value_type));
+    value_type *res_i = static_cast<value_type *>(voidPtr);
 
     // Fill the arrays with data
     initialize(N, x1, x2, y1);
     initialize(N, y2, res_r, res_i);
 
-
-    // COMPUTATION
     t.start();
-    multiply(N, x1, y1, x2, y2, res_r, res_i);
+    int SIMD_width = sizeof(__m256d) / sizeof(value_type);
+    int SIMD_blocks = N / SIMD_width;
+    //cout << "SIMD_width = " << SIMD_width << endl;
+    //cout << "SIMD_blocks = " << SIMD_blocks << endl;
+
+    for (int i = 0; i < SIMD_blocks; ++i) {
+        // Load the values into a register
+        __m256d x1_avx = _mm256_load_pd(x1 + i * SIMD_width);
+        __m256d y1_avx = _mm256_load_pd(y1 + i * SIMD_width);
+        __m256d x2_avx = _mm256_load_pd(x2 + i * SIMD_width);
+        __m256d y2_avx = _mm256_load_pd(y2 + i * SIMD_width);
+        __m256d res_r_avx;
+        __m256d res_i_avx;
+
+        // Perform multiplication
+        multiply(x1_avx, y1_avx, x2_avx, y2_avx, &res_r_avx, &res_i_avx);
+
+        // Write the results to an array
+        _mm256_store_pd(res_r + i * SIMD_width, res_r_avx);
+        _mm256_store_pd(res_i + i * SIMD_width, res_i_avx);
+    }
+
+    // Perform multiplications of left-over elements
+    for (int j = SIMD_width * SIMD_blocks; j < N; ++j) {
+        res_r[j] = x1[j] * x2[j] - y1[j] * y2[j];
+        res_i[j] = x1[j] * y2[j] + x2[j] * y1[j];
+    }
     t.stop();
 
     return t.get_timing();
