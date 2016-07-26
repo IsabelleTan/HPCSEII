@@ -22,6 +22,6 @@ typedef double value_type;
 }*/
 
 int main() {
-    time(100);
+    testp2e();
     return 0;
 }

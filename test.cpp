@@ -453,8 +453,8 @@ value_type timep2e(int N, int order){
     value_type *y = new value_type[N];
     value_type *mass = new value_type[N];
 
-    value_type xCom = 0.5;
-    value_type yCom = 0.5;
+    value_type xCom = 3;
+    value_type yCom = 1;
 
     initialize(N, x, y, mass);
 
@@ -482,16 +482,16 @@ bool testp2e(){
 
     value_type x[4] = {1, 2, 3, 4};
     value_type y[4] = {4, 3, 2, 1};
-    value_type mass[4] = {5, 6, 7, 8};
+    value_type mass[4] = {0, 1, 0, 1};
 
-    value_type xCom= 2.5;
-    value_type yCom = 2.5;
+    value_type xCom = 3;
+    value_type yCom = 2;
 
     value_type expansion[4] = {0};
 
-    p2e(x, y, mass, N, order, xCom, yCom, expansion, expansion + order);
+    p2eAVX(x, y, mass, N, order, xCom, yCom, expansion, expansion + order);
 
-    value_type control[4] = {-70, -25, -60, -130};
+    value_type control[4] = {0, 0, 0, 2};
 
     for (int i = 0; i < 4; ++i) {
         if (abs(expansion[i] - control[i]) > epsilon){
@@ -505,6 +505,8 @@ bool testp2e(){
 
     if (result){
         cout << "Test succeeded" << endl;
+    } else {
+        cout << "Test failed" << endl;
     }
 
     return result;
@@ -866,6 +868,10 @@ value_type timeMultiplySTD(int N) {
         res[i] = x[i] * y[i];
     }
     t.stop();
+
+    delete[] x;
+    delete[] y;
+    delete[] res;
 
     return t.get_timing();
 }
