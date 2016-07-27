@@ -22,6 +22,6 @@ typedef double value_type;
 }*/
 
 int main() {
-    testp2e();
+    cout << HsumAvxDbl_test() << endl;
     return 0;
 }

@@ -877,6 +877,27 @@ value_type timeMultiplySTD(int N) {
 }
 
 /*
+ * A test function for the horizontal add function
+ */
+bool HsumAvxDbl_test() {
+    bool result = true;
+
+    __m256d avx = _mm256_set_pd(1, 2, 3, 4);
+    double hadd = HsumAvxDbl(avx);
+
+    if (hadd != 10) {
+        result = false;
+    }
+
+    if (result) {
+        cout << "Test succeeded!" << endl;
+    } else {
+        cout << "Test failed" << endl;
+    }
+    return result;
+}
+
+/*
  * A function to time something N times and compute the average and variance
  */
 void time(int N){
