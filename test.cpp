@@ -478,20 +478,20 @@ value_type timep2e(int N, int order){
 bool testp2e(){
     bool result = true;
     int order = 2;
-    int N = 4;
+    int N = 6;
 
-    value_type x[4] = {1, 2, 3, 4};
-    value_type y[4] = {4, 3, 2, 1};
-    value_type mass[4] = {0, 1, 0, 1};
+    value_type x[6] = {1, 2, 3, 4, 5, 6};
+    value_type y[6] = {6, 5, 4, 3, 2, 1};
+    value_type mass[6] = {0, 1, 0, 1, 0, 1};
 
-    value_type xCom = 3;
-    value_type yCom = 2;
+    value_type xCom = 4;
+    value_type yCom = 3;
 
     value_type expansion[4] = {0};
 
     p2eAVX(x, y, mass, N, order, xCom, yCom, expansion, expansion + order);
 
-    value_type control[4] = {0, 0, 0, 2};
+    value_type control[4] = {0, 0, 0, 8};
 
     for (int i = 0; i < 4; ++i) {
         if (abs(expansion[i] - control[i]) > epsilon){

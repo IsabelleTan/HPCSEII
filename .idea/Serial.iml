@@ -2,19 +2,21 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/quadtree.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/timeMorton.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/expansion.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/timer.hpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/test.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/timeMorton.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/quadtree.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/morton.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/test.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/quadtree.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/morton.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/timeMorton.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/expansion.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/morton.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/morton.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/complexAVX.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/complexAVX.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/test.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/quadtree.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/test.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/timeMorton.cpp" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">

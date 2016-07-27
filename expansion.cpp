@@ -45,16 +45,13 @@ void p2e(const value_type* const x, const value_type* const y, const value_type*
 }
 
 /*
- * A kernel to compute the particle to expansion computations
- * TODO when debugging this function gives the exception EXC_BAD_ACCESS (code=EXC_I386_GPFLT))
+ * A kernel to compute the particle to expansion computations using AVX intrinsics
  */
 void p2eAVX(const value_type *const x, const value_type *const y, const value_type *const q, const int nsources,
             const int order, const value_type xcom, const value_type ycom, value_type *const rexpansion,
             value_type *const iexpansion) {
     int SIMD_width = sizeof(__m256d) / sizeof(value_type);
     int SIMD_blocks = nsources / SIMD_width;
-    cout << "SIMD_width = " << SIMD_width << endl;
-    cout << "SIMD_blocks = " << SIMD_blocks << endl;
 
     // Make arrays to store the radii and the values for different orders of r so they can be reused in the computation
     value_type *r = new value_type[2 * nsources];
@@ -76,16 +73,16 @@ void p2eAVX(const value_type *const x, const value_type *const y, const value_ty
             __m256d y1 = _mm256_loadu_pd(r + nsources + k * SIMD_width);
             __m256d x2 = _mm256_loadu_pd(z + k * SIMD_width);
             __m256d y2 = _mm256_loadu_pd(z + nsources + k * SIMD_width);
-            __m256d res_r = _mm256_set_pd(0, 0, 0, 0);
-            __m256d res_i = _mm256_set_pd(0, 0, 0, 0);
+            __m256d res_r = _mm256_set1_pd(0);
+            __m256d res_i = _mm256_set1_pd(0);
 
 
             // Multiply with z to obtain the next power of q*z^j
             multiply(x1, y1, x2, y2, &res_r, &res_i);
 
             // Store the new value in r
-            _mm256_store_pd(r + k * SIMD_width, res_r);
-            _mm256_store_pd(r + nsources + k * SIMD_width, res_i);
+            _mm256_storeu_pd(r + k * SIMD_width, res_r);
+            _mm256_storeu_pd(r + nsources + k * SIMD_width, res_i);
 
             // Add the real and imaginary part to the arrays containing the expansion alpha's
             rexpansion[j - 1] += HsumAvxDbl(res_r);
