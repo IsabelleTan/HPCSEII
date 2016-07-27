@@ -14,9 +14,10 @@ using namespace std;
  */
 void p2e(const value_type* const x, const value_type* const y, const value_type* const q, const int nsources, const int order, const value_type xcom, const value_type ycom, value_type* const rexpansion, value_type* const iexpansion){
     // Make arrays to store the radii and the values for different orders of r that are used in the multiplication
-    complex<value_type>* r = new complex<value_type>[nsources];
+    complex<value_type> *r = new complex<value_type>[nsources];
     complex<value_type> *z = new complex<value_type>[nsources];
 
+    // Fill the r array with initial values and fill the z array with the radii
     for (int i = 0; i < nsources; ++i) {
         r[i] = -q[i];
         z[i] = complex<value_type>(x[i], y[i]) - complex<value_type>(xcom, ycom);
@@ -27,10 +28,10 @@ void p2e(const value_type* const x, const value_type* const y, const value_type*
         rexpansion[j - 1] = 0;
         iexpansion[j - 1] = 0;
         for (int k = 0; k < nsources; ++k) {
-            // Multiply with z to obtain the next power of z
+            // Multiply with z to obtain the next power of q*z^j
             r[k] *= z[k];
 
-            // Write real and imaginary part to the arrays containing the expansion alpha's
+            // Add real and imaginary part to the arrays containing the expansion alpha's
             rexpansion[j - 1] += r[k].real();
             iexpansion[j - 1] += r[k].imag();
         }
@@ -50,12 +51,15 @@ void p2e(const value_type* const x, const value_type* const y, const value_type*
 void p2eAVX(const value_type *const x, const value_type *const y, const value_type *const q, const int nsources,
             const int order, const value_type xcom, const value_type ycom, value_type *const rexpansion,
             value_type *const iexpansion) {
+    // Compute the vectorization parameters
     int SIMD_width = sizeof(__m256d) / sizeof(value_type);
     int SIMD_blocks = nsources / SIMD_width;
 
     // Make arrays to store the radii and the values for different orders of r so they can be reused in the computation
     value_type *r = new value_type[2 * nsources];
     value_type *z = new value_type[2 * nsources];
+
+    // Fill the r array with initial values and fill the z array with the radii
     for (int i = 0; i < nsources; ++i) {
         r[i] = -q[i];
         r[nsources + i] = 0;
@@ -97,7 +101,7 @@ void p2eAVX(const value_type *const x, const value_type *const y, const value_ty
             r[i] = r_r * z[i] - r_i * z[nsources + i];
             r[i + nsources] = r_r * z[nsources + i] + z[i] * r_i;
 
-            // Add the new power of q*z^j to the expansion
+            // Add the new power of q*z^j to the real and imaginary parts of the expansion
             rexpansion[j - 1] += r[i];
             iexpansion[j - 1] += r[i + nsources];
         }
